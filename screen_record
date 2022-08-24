@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+
+mkdir -p ~/Pictures/Screen_Recording/
+video_resolution=1920X1080
+filename="ScreenRecord_from_`date +%F_%H-%M-%S`.mkv"
+filePATH=~/Pictures/Screen_Recording/${filename}
+
+echo "Available sources"
+pactl list short sources | awk '{ print $1, $2, $7}' | column -t
+recordingDevice=`pactl list short sources | awk '$7 ~ /IDLE/ { print $2 }'`
+read -p "Enter the Source Number [press Enter to Choose Default]: " number
+
+echo Choosen number is $number
+
+if [ -z "$number" ]
+then
+	recordingDevice=`pactl list short sources | awk '$7 ~ /IDLE/ { print $2 }'`
+else
+	recordingDevice=`pactl list short sources | awk -v Number="$number" '$1 ~ Number { print $2 }'`
+fi
+
+echo Choosen source device is $recordingDevice
+
+ffmpeg -video_size $video_resolution -framerate 25 -f x11grab -i :0.0+0,0 -f pulse -ac 2 -i $recordingDevice $filePATH -loglevel error
