@@ -1,16 +1,23 @@
 #!/usr/bin/bash
 
-mkdir -p ~/Pictures/Screen_Recording/
+# Choose the location, where the recordings will be saved
+path=~/Pictures
+
+# Creates a folder in the specified path, where the recordinds will be saved
+mkdir -p ${path}/Screen_Recording/
+
+# Choose the resolution of your display screen
 video_resolution=1920X1080
-filename="ScreenRecord_from_`date +%F_%H-%M-%S`.mkv"
-filePATH=~/Pictures/Screen_Recording/${filename}
+
+# Saves the file in mkv format
+filename="Screen_Record_from_`date +%F_%H-%M-%S`.mkv"
+filePATH=${path}/Screen_Recording/${filename}
 
 echo "Available sources"
 pactl list short sources | awk '{ print $1, $2, $7}' | column -t
-recordingDevice=`pactl list short sources | awk '$7 ~ /IDLE/ { print $2 }'`
 read -p "Enter the Source Number [press Enter to Choose Default]: " number
 
-echo Choosen number is $number
+#echo Choosen number is $number
 
 if [ -z "$number" ]
 then
@@ -19,6 +26,6 @@ else
 	recordingDevice=`pactl list short sources | awk -v Number="$number" '$1 ~ Number { print $2 }'`
 fi
 
-echo Choosen source device is $recordingDevice
+#echo Choosen source device is $recordingDevice
 
 ffmpeg -video_size $video_resolution -framerate 25 -f x11grab -i :0.0+0,0 -f pulse -ac 2 -i $recordingDevice $filePATH -loglevel error
