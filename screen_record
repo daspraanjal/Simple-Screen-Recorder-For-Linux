@@ -9,8 +9,10 @@ mkdir -p ${path}/Screen_Recording/
 # Choose the resolution of your display screen
 video_resolution=1920X1080
 
-# Saves the file in mkv format
-filename="Screen_Record_from_`date +%F_%H-%M-%S`.mkv"
+# Choose the video format
+extension=mp4 #mkv, mp4, mpeg
+
+filename="Screen_Record_from_`date +%F_%H-%M-%S`.${extension}"
 filePATH=${path}/Screen_Recording/${filename}
 
 echo "Available sources"
@@ -28,4 +30,7 @@ fi
 
 #echo Choosen source device is $recordingDevice
 
-ffmpeg -video_size $video_resolution -framerate 25 -f x11grab -i :0.0+0,0 -f pulse -ac 2 -i $recordingDevice $filePATH -loglevel error
+# Set the recording sound volume
+pactl set-source-volume $recordingDevice 80%
+
+ffmpeg -video_size $video_resolution -framerate 25 -f x11grab -i :0.0 -f pulse -ac 2 -i $recordingDevice $filePATH -loglevel error
